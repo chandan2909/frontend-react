@@ -3,8 +3,10 @@ import apiClient from '@/lib/apiClient';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
+import useAuthStore from '@/store/authStore';
 
 export default function Home() {
+  const { isAuthenticated } = useAuthStore();
   const [subjects, setSubjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -86,12 +88,21 @@ export default function Home() {
                 >
                   Browse courses ↓
                 </a>
-                <Link
-                  to="/auth/register"
-                  className="px-6 py-3 border border-white/30 text-white font-bold hover:bg-white/10 transition-colors text-sm"
-                >
-                  Sign up free
-                </Link>
+                {!isAuthenticated ? (
+                  <Link
+                    to="/auth/register"
+                    className="px-6 py-3 border border-white/30 text-white font-bold hover:bg-white/10 transition-colors text-sm"
+                  >
+                    Sign up free
+                  </Link>
+                ) : (
+                  <Link
+                    to="/profile"
+                    className="px-6 py-3 border border-white/30 text-white font-bold hover:bg-white/10 transition-colors text-sm"
+                  >
+                    Go to My Learning
+                  </Link>
+                )}
               </div>
             </div>
 
