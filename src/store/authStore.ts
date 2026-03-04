@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import apiClient from '../lib/apiClient';
+// Import the store (not just the hook) so we can call getState() outside React
+import useCartStore from './cartStore';
 
 interface User {
   id: number;
@@ -19,23 +21,6 @@ interface AuthState {
   logout: () => void;
 }
 
-// Imported lazily to avoid circular dependency
-const clearCartStore = () => {
-  try {
-    // Directly clear the localStorage key used by cartStore
-    const raw = localStorage.getItem('kodemy-cart');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      parsed.state.purchased = [];
-      parsed.state.items = [];
-      localStorage.setItem('kodemy-cart', JSON.stringify(parsed));
-    }
-  } catch (e) {
-    // If anything goes wrong, just remove the key entirely
-    localStorage.removeItem('kodemy-cart');
-  }
-};
-
 const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -53,15 +38,13 @@ const useAuthStore = create<AuthState>()(
         }
       },
       logout: () => {
-        // Clear cart purchased state so the next user doesn't see stale data
-        clearCartStore();
+        // Clear cart in-memory state AND localStorage so items disappear immediately
+        useCartStore.getState().clearAll();
         set({ accessToken: null, isAuthenticated: false, user: null });
         apiClient.post('/auth/logout').catch(() => {});
       },
     }),
-    {
-      name: 'auth-storage',
-    }
+    { name: 'auth-storage' }
   )
 );
 
