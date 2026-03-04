@@ -18,8 +18,10 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  // Track enrollment from backend (source of truth) OR cartStore (optimistic)
+  const [enrolled, setEnrolled] = useState(false);
 
-  const purchased = isPurchased(parsedId);
+  // cartStore acts as an optimistic local cache; backend is the source of truth
   const inCart = isInCart(parsedId);
 
   const getGradient = (id: number) => {
@@ -69,6 +71,27 @@ export default function CoursePage() {
     };
     fetchData();
   }, [parsedId]);
+
+  // Separately check enrollment status from backend (authoritative source)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setEnrolled(false);
+      return;
+    }
+    // Use cartStore optimistic value first, then confirm from backend
+    if (isPurchased(parsedId)) {
+      setEnrolled(true);
+      return;
+    }
+    // Fetch enrollment truth from backend progress overview
+    apiClient.get('/progress/overview').then(({ data }) => {
+      const isEnrolled = data.some((course: any) => course.subject_id === parsedId);
+      setEnrolled(isEnrolled);
+    }).catch(() => {
+      // If backend fails, fall back to local cache
+      setEnrolled(isPurchased(parsedId));
+    });
+  }, [parsedId, isAuthenticated]);
 
   const handleBuy = async () => {
     if (!isAuthenticated) {
@@ -188,7 +211,7 @@ export default function CoursePage() {
                 </p>
 
                 {/* Buttons */}
-                {purchased ? (
+                {enrolled ? (
                   <button
                     onClick={handleStartLearning}
                     className="w-full py-3 bg-[#5624d0] text-white font-bold text-base rounded hover:bg-[#4a1fb8] transition-colors mb-3"
