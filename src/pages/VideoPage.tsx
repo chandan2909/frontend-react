@@ -170,25 +170,43 @@ export default function VideoPage() {
         <p className="text-gray-300 text-sm">{videoData.description || 'No description provided.'}</p>
       </div>
 
-      <div className="w-full max-w-[1000px] mx-auto relative group px-4 md:px-0">
-        {/* Navigation Buttons Container */}
-        <div className="absolute inset-y-0 left-0 md:-left-20 flex items-center z-10">
+      <div className="w-full max-w-[1000px] mx-auto relative group">
+        {/* Video + embedded nav buttons */}
+        <div className="w-full rounded-lg overflow-hidden shadow-2xl border border-gray-800 relative">
+
+          {/* Previous button - overlaid on left edge of video */}
           {videoData.previous_video_id && (
-            <button 
+            <button
               onClick={() => navigate(`/subjects/${parsedSubjectId}/video/${videoData.previous_video_id}`)}
-              className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/90 text-white transition-all transform hover:scale-110 shadow-2xl border border-white/10 backdrop-blur-sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/90 text-white transition-all transform hover:scale-110 shadow-2xl border border-white/20 backdrop-blur-sm"
               title="Previous Lesson"
             >
-              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
           )}
-        </div>
 
-        <div className="w-full rounded-lg overflow-hidden shadow-2xl border border-gray-800 relative">
-          <VideoPlayer 
-            youtubeId={videoData.youtube_url} 
+          {/* Next button - overlaid on right edge of video */}
+          {videoData.next_video_id && (
+            <button
+              onClick={() => navigate(`/subjects/${parsedSubjectId}/video/${videoData.next_video_id}`)}
+              disabled={!completionMarked}
+              className={`absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full transition-all transform hover:scale-110 shadow-2xl border backdrop-blur-sm ${
+                completionMarked
+                  ? 'bg-black/60 hover:bg-black/90 text-white border-white/20'
+                  : 'bg-black/20 text-gray-600 border-transparent cursor-not-allowed opacity-30'
+              }`}
+              title={completionMarked ? 'Next Lesson' : 'Complete lesson to unlock'}
+            >
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+
+          <VideoPlayer
+            youtubeId={videoData.youtube_url}
             onEnd={onVideoEnd}
             onStateChange={onStateChange}
             onReady={onPlayerReady}
@@ -197,17 +215,17 @@ export default function VideoPage() {
           {/* Auto-play Overlay */}
           {autoPlayCountdown !== null && (
             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-20 backdrop-blur-sm transition-all duration-300">
-              <div className="text-center p-8 rounded-xl bg-[#2d2f31] border border-white/10 shadow-2xl scale-in-center">
+              <div className="text-center p-8 rounded-xl bg-[#2d2f31] border border-white/10 shadow-2xl">
                 <h3 className="text-xl font-bold text-white mb-2">Up Next</h3>
                 <p className="text-gray-400 mb-6 text-sm">Next lesson starting in <span className="text-white font-mono text-lg">{autoPlayCountdown}</span> seconds...</p>
-                <div className="flex gap-4">
-                  <button 
+                <div className="flex gap-4 justify-center">
+                  <button
                     onClick={() => setAutoPlayCountdown(null)}
                     className="px-6 py-2 rounded font-bold border border-white/20 hover:bg-white/10 text-white transition-colors text-sm"
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     onClick={() => navigate(`/subjects/${parsedSubjectId}/video/${videoData.next_video_id}`)}
                     className="px-6 py-2 rounded font-bold bg-white text-black hover:bg-gray-200 transition-colors text-sm"
                   >
@@ -216,25 +234,6 @@ export default function VideoPage() {
                 </div>
               </div>
             </div>
-          )}
-        </div>
-
-        <div className="absolute inset-y-0 right-0 md:-right-20 flex items-center z-10">
-          {videoData.next_video_id && (
-            <button 
-              onClick={() => navigate(`/subjects/${parsedSubjectId}/video/${videoData.next_video_id}`)}
-              disabled={!completionMarked}
-              className={`w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-full transition-all transform hover:scale-110 shadow-2xl border backdrop-blur-sm ${
-                completionMarked 
-                  ? 'bg-black/60 hover:bg-black/90 text-white border-white/10' 
-                  : 'bg-black/20 text-gray-600 border-transparent cursor-not-allowed opacity-30'
-              }`}
-              title={completionMarked ? "Next Lesson" : "Complete lesson to unlock"}
-            >
-              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
           )}
         </div>
       </div>
