@@ -13,13 +13,18 @@ export default function CartPage() {
   const originalTotal = getOriginalTotal();
   const discount = originalTotal > 0 ? Math.round((1 - total / originalTotal) * 100) : 0;
 
-  const handleCheckout = () => {
-    purchaseAll();
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      navigate('/');
-    }, 2500);
+  const handleCheckout = async () => {
+    try {
+      await purchaseAll();
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigate('/');
+      }, 2500);
+    } catch (error) {
+      console.error('Checkout failed:', error);
+      alert('Purchase failed. Please ensure you are logged in and try again.');
+    }
   };
 
   return (

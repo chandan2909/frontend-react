@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import apiClient from '@/lib/apiClient';
 
 export interface CartItem {
   id: number;
@@ -17,7 +18,7 @@ interface CartState {
   clearCart: () => void;
   isInCart: (id: number) => boolean;
   isPurchased: (id: number) => boolean;
-  purchaseAll: () => void;
+  purchaseAll: () => Promise<void>;
   purchaseSingle: (id: number) => void;
   getTotal: () => number;
   getOriginalTotal: () => number;
@@ -25,7 +26,6 @@ interface CartState {
 
 const useCartStore = create<CartState>()(
   persist(
-  
     (set, get) => ({
       items: [],
       purchased: [],
@@ -47,10 +47,22 @@ const useCartStore = create<CartState>()(
 
       isPurchased: (id) => get().purchased.includes(id),
 
-      purchaseAll: () => {
+      purchaseAll: async () => {
         const { items, purchased } = get();
-        const newPurchased = [...purchased, ...items.map((i) => i.id)];
-        set({ purchased: [...new Set(newPurchased)], items: [] });
+        if (items.length === 0) return;
+
+        const subjectIds = items.map((i) => i.id);
+        
+        try {
+          // Notify backend
+          await apiClient.post('/subjects/enroll', { subjectIds });
+          
+          const newPurchased = [...purchased, ...subjectIds];
+          set({ purchased: [...new Set(newPurchased)], items: [] });
+        } catch (error) {
+          console.error('Failed to persist enrollment:', error);
+          throw error;
+        }
       },
 
       purchaseSingle: (id) => {
