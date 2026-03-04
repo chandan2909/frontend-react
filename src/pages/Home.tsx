@@ -15,24 +15,7 @@ export default function Home() {
     apiClient.get('/subjects')
       .then(({ data }) => setSubjects(data))
       .catch(() => setError('Failed to load subjects.'))
-      .finally(() => setLoading(false));
   }, []);
-
-  const getColor = (id: number) => {
-    const colors = [
-      'bg-indigo-600',
-      'bg-blue-600',
-      'bg-emerald-600',
-      'bg-red-600',
-      'bg-rose-600',
-    ];
-    return colors[id % colors.length];
-  };
-
-  const getIcon = (id: number) => {
-    const icons = ['🧠', '📊', '🌐', '⚡', '🔬'];
-    return icons[id % icons.length];
-  };
 
   const seededRandom = (seed: number) => {
     let x = Math.sin(seed * 9301 + 49297) * 233280;
@@ -44,8 +27,6 @@ export default function Home() {
   const getOriginalPrice = (id: number) => Math.round(getCoursePrice(id) * (3 + seededRandom(id + 100) * 4));
   const getCourseRating = (id: number) => (4 + seededRandom(id + 200) * 0.9).toFixed(1);
   const getCourseStudents = (id: number) => Math.floor(seededRandom(id + 300) * 150000) + 5000;
-  const getCourseLectures = (id: number) => Math.floor(seededRandom(id + 400) * 80) + 10;
-  const getCourseHours = (id: number) => Math.floor(seededRandom(id + 500) * 50) + 5;
 
   const stats = [
     { value: '5+', label: 'Expert courses' },
@@ -162,18 +143,7 @@ export default function Home() {
                   to={`/course/${subject.id}`}
                   className="group flex flex-col bg-white border border-gray-200 hover:border-[#1c1d1f] hover:shadow-lg transition-all duration-200 text-left overflow-hidden"
                 >
-                  {/* Thumbnail */}
-                  <div className={`relative w-full aspect-video ${getColor(subject.id)} flex flex-col items-center justify-center`}>
-                    <span className="text-4xl mb-1">{getIcon(subject.id)}</span>
-                    <span className="text-white/80 text-xs font-semibold uppercase tracking-wider">
-                      {getCourseHours(subject.id)}h · {getCourseLectures(subject.id)} lectures
-                    </span>
-                    {subject.id % 2 !== 0 && (
-                      <span className="absolute top-2 left-2 bg-[#eceb98] text-[#3d3c0a] text-[10px] font-black px-2 py-0.5 uppercase tracking-wide">
-                        Bestseller
-                      </span>
-                    )}
-                  </div>
+
 
                   {/* Body */}
                   <div className="flex flex-col flex-grow p-4">
