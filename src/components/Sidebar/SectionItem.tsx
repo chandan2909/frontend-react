@@ -17,7 +17,7 @@ export default function SectionItem({ section, subjectId }: SectionItemProps) {
         {section.videos.map((video: any) => {
           const isActive = pathname.includes(`/video/${video.id}`);
           
-          if (video.locked) {
+          if (video.locked && !isActive) {
             return (
               <div 
                 key={video.id}

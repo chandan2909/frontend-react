@@ -103,18 +103,36 @@ export default function VideoPage() {
     );
   }
 
-  if (error || !videoData) {
+  if (error || !videoData || videoData.locked) {
+    const isLocked = videoData?.locked || error.includes('locked');
     return (
-      <div className="flex h-full items-center justify-center p-8">
+      <div className="flex h-full items-center justify-center p-8 bg-[#1c1d1f] min-h-screen">
         <div className="text-center">
-          <div className="text-red-500 bg-red-50 p-6 rounded-lg mb-4 max-w-lg">
-            {error || 'Video not found.'}
+          <div className="bg-[#2d2f31] p-10 rounded-lg mb-6 max-w-lg border border-gray-700 shadow-xl">
+             <div className="flex justify-center mb-6">
+                <svg className="w-16 h-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+             </div>
+             <h2 className="text-2xl font-bold text-white mb-3">
+                {isLocked ? 'This lesson is locked' : 'Video not found'}
+             </h2>
+             <p className="text-gray-400 text-base mb-2">
+                {isLocked 
+                  ? 'Please complete all previous lessons in order to unlock this content.' 
+                  : error || 'The requested video could not be found.'}
+             </p>
+             {videoData?.unlock_reason && (
+                <p className="text-sm text-[#cec0fc] mt-4 italic">
+                   Reason: {videoData.unlock_reason}
+                </p>
+             )}
           </div>
           <button 
             onClick={() => navigate(`/subjects/${parsedSubjectId}`)}
-            className="text-sm font-medium hover:underline text-white"
+            className="px-8 py-2 bg-white text-black font-bold tracking-tight hover:bg-gray-200 transition-colors"
           >
-            &larr; Back to Course
+            Back to Course
           </button>
         </div>
       </div>
@@ -150,11 +168,11 @@ export default function VideoPage() {
         {videoData.next_video_id ? (
           <button 
             onClick={() => navigate(`/subjects/${parsedSubjectId}/video/${videoData.next_video_id}`)}
-            disabled={!completionMarked && videoData.next_video_id}
+            disabled={!completionMarked}
             className={`flex items-center gap-2 px-6 py-2 text-sm font-bold transition-colors ${
               completionMarked 
-                ? 'bg-white text-black hover:bg-gray-200 border border-white' 
-                : 'bg-transparent text-gray-500 border border-gray-600 cursor-not-allowed hidden'
+                ? 'bg-white text-black hover:bg-gray-200 border border-white opacity-100' 
+                : 'bg-transparent text-gray-500 border border-gray-600 cursor-not-allowed opacity-50'
             }`}
           >
             Next Lesson &rarr;

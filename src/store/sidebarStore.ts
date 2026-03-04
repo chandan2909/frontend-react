@@ -22,15 +22,22 @@ const useSidebarStore = create<SidebarState>((set, get) => ({
       set({ error: err.message || 'Failed to fetch tree', loading: false });
     }
   },
-  markVideoCompleted: () => {
-    const { tree } = get();
+  markVideoCompleted: (videoId: number) => {
+    const { tree, fetchTree } = get();
     if (!tree) return;
     
-    // We update the store optimistically. Realistically, we'd trigger a refetch of the tree 
-    // to get the true locked statuses, because completing one unlocks the next.
-    // For simplicity, we just trigger a full fetch again in background if wanted,
-    // or we just rely on page navigation. A refetch solves the complex lock logic perfectly.
-    get().fetchTree(tree.id);
+    // Optimistic update
+    const updatedSections = tree.sections.map((section: any) => ({
+      ...section,
+      videos: section.videos.map((video: any) => 
+        video.id === videoId ? { ...video, is_completed: true } : video
+      )
+    }));
+    
+    set({ tree: { ...tree, sections: updatedSections } });
+
+    // Refetch to get updated locked statuses from backend
+    fetchTree(tree.id);
   },
 }));
 
