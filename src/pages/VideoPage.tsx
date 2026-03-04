@@ -77,9 +77,15 @@ export default function VideoPage() {
         is_completed: isFinished
       });
 
+      // Only trigger once — when video goes from incomplete to complete
       if (isFinished && !completionMarked) {
         setCompletionMarked(true);
         markVideoCompleted(parsedVideoId);
+        // Trigger autoplay here, NOT in onVideoEnd, to avoid stale closure issues
+        // with the YouTube player re-using the original registered handler.
+        if (videoData?.next_video_id) {
+          setAutoPlayCountdown(5);
+        }
       }
     } catch (error) {
       console.error('Failed to update progress', error);
@@ -102,15 +108,8 @@ export default function VideoPage() {
   const onVideoEnd = () => {
     if (playerRef.current) {
       const duration = playerRef.current.getDuration();
-
-      // Only start autoplay countdown if this is a NEW completion.
-      // If the video was already completed before this session, skip the popup.
-      const wasAlreadyCompleted = completionMarked;
+      // Autoplay is triggered inside handleProgress to avoid stale closure issues
       handleProgress(duration, true);
-
-      if (videoData?.next_video_id && !wasAlreadyCompleted) {
-        setAutoPlayCountdown(5);
-      }
     }
   };
 
