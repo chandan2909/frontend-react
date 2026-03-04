@@ -15,6 +15,7 @@ export default function Home() {
     apiClient.get('/subjects')
       .then(({ data }) => setSubjects(data))
       .catch(() => setError('Failed to load subjects.'))
+      .finally(() => setLoading(false));
   }, []);
 
   const seededRandom = (seed: number) => {
