@@ -15,10 +15,8 @@ let intervalId: ReturnType<typeof setInterval> | null = null;
 async function ping() {
   try {
     await fetch(PING_URL, { method: 'GET' });
-    console.log(`[KeepAlive] Pinged server at ${new Date().toLocaleTimeString()}`);
   } catch {
     // Silently ignore – the server might be waking up or offline temporarily
-    console.warn('[KeepAlive] Ping failed – will retry next interval.');
   }
 }
 
@@ -34,7 +32,6 @@ export function startKeepAlive() {
   ping();
 
   intervalId = setInterval(ping, PING_INTERVAL_MS);
-  console.log('[KeepAlive] Started – pinging every 14 minutes.');
 }
 
 /**
@@ -44,6 +41,5 @@ export function stopKeepAlive() {
   if (intervalId !== null) {
     clearInterval(intervalId);
     intervalId = null;
-    console.log('[KeepAlive] Stopped.');
   }
 }
