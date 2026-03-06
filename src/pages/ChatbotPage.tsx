@@ -60,6 +60,11 @@ export default function ChatbotPage() {
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Streaming state
+  const [streamingText, setStreamingText] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const streamingChatIdRef = useRef<string | null>(null);
+  const streamIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -125,10 +130,10 @@ export default function ChatbotPage() {
     }
   }, [chats, isAuthenticated]);
 
-  // Scroll to bottom
+  // Scroll to bottom when messages change OR while streaming
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeChat?.messages, loading]);
+  }, [activeChat?.messages, loading, streamingText]);
 
   // --- Chat actions ---
 
@@ -180,7 +185,7 @@ export default function ChatbotPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || loading) return;
+    if (!input.trim() || loading || isStreaming) return;
 
     const userMsg = input.trim();
     setInput('');
@@ -226,21 +231,47 @@ export default function ChatbotPage() {
       aiText = "Sorry, I'm having trouble connecting to the AI server right now. Please try again.";
     }
 
-    // Update UI immediately — spinner disappears as soon as we have the response
-    updateLocalChat(chatId, chat => ({
-      ...chat,
-      messages: [...chat.messages, { role: 'assistant', content: aiText }],
-    }));
+    // Stop the three-dot loader and start streaming
     setLoading(false);
+    setIsStreaming(true);
+    streamingChatIdRef.current = chatId;
 
-    // Persist AI response to backend in the background (fire-and-forget)
-    if (isAuthenticated) {
-      apiClient.post(`/chats/${chatId}/messages`, {
-        role: 'assistant',
-        content: aiText,
-        createdAt: Date.now(),
-      }).catch(() => { /* ignore */ });
-    }
+    // Clear any previous streaming interval
+    if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
+
+    let charIndex = 0;
+    // Adaptive speed: reveal the full text in roughly 1.5–2 seconds
+    // ~150 chars/s for short texts, faster for long ones
+    const totalChars = aiText.length;
+    const targetMs = Math.min(2000, Math.max(800, totalChars * 8));
+    const tickMs = 16; // ~60fps
+    const charsPerTick = Math.max(1, Math.ceil(totalChars / (targetMs / tickMs)));
+
+    streamIntervalRef.current = setInterval(() => {
+      charIndex = Math.min(charIndex + charsPerTick, totalChars);
+      setStreamingText(aiText.slice(0, charIndex));
+
+      if (charIndex >= totalChars) {
+        // Streaming done — commit to permanent messages
+        if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
+        updateLocalChat(chatId, chat => ({
+          ...chat,
+          messages: [...chat.messages, { role: 'assistant', content: aiText }],
+        }));
+        setIsStreaming(false);
+        setStreamingText('');
+        streamingChatIdRef.current = null;
+
+        // Persist to backend fire-and-forget
+        if (isAuthenticated) {
+          apiClient.post(`/chats/${chatId}/messages`, {
+            role: 'assistant',
+            content: aiText,
+            createdAt: Date.now(),
+          }).catch(() => { /* ignore */ });
+        }
+      }
+    }, tickMs);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -346,6 +377,10 @@ export default function ChatbotPage() {
             {activeChat?.messages.map((msg, i) => (
               <ChatMessage key={i} role={msg.role} content={msg.content} />
             ))}
+            {/* Streaming message — shown while typewriter reveal is running */}
+            {isStreaming && streamingChatIdRef.current === activeChat?.id && (
+              <ChatMessage role="assistant" content={streamingText + '▋'} />
+            )}
             {loading && (
               <div className="py-6 px-4 bg-[#f7f9fa] border-y border-gray-100">
                 <div className="max-w-3xl mx-auto flex gap-6">
