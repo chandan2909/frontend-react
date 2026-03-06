@@ -11,7 +11,7 @@ export default function SubjectLayout() {
     <AuthGuard>
       <div className="flex flex-col h-screen overflow-hidden">
         <Header />
-        <div className="flex flex-1 overflow-hidden bg-[#1c1d1f] pt-[72px]">
+        <div className="flex flex-col lg:flex-row flex-1 overflow-hidden bg-[#1c1d1f] pt-[72px]">
           <div className="flex-1 relative overflow-y-auto custom-scrollbar text-white">
             <Outlet />
           </div>

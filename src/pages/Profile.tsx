@@ -42,12 +42,12 @@ export default function ProfilePage() {
         
         {/* User Banner */}
         <div className="bg-[#1c1d1f] text-white pt-[112px] pb-[40px]">
-          <div className="max-w-5xl mx-auto px-6 flex items-center gap-6">
-            <div className="w-24 h-24 bg-[#2d2f31] rounded-full flex items-center justify-center text-4xl font-bold font-serif border-4 border-[#3e4143]">
+          <div className="max-w-5xl mx-auto px-4 md:px-6 flex items-center gap-4 md:gap-6">
+            <div className="w-16 h-16 md:w-24 md:h-24 bg-[#2d2f31] rounded-full flex items-center justify-center text-2xl md:text-4xl font-bold font-serif border-4 border-[#3e4143]">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-1 font-serif">{user?.name || 'Student'}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold mb-1 font-serif">{user?.name || 'Student'}</h1>
               <p className="text-[#c0c4cc] text-sm mb-2">{user?.email || 'Loading email...'}</p>
               <p className="text-sm font-medium text-[#cec0fc]">Student since {joinDate}</p>
             </div>
@@ -56,12 +56,12 @@ export default function ProfilePage() {
 
         {/* Profile Navigation */}
         <div className="bg-white border-b border-gray-200 sticky top-[72px] z-40">
-           <div className="max-w-5xl mx-auto px-6 flex gap-8">
+           <div className="max-w-5xl mx-auto px-4 md:px-6 flex gap-4 md:gap-8 overflow-x-auto hide-scrollbar whitespace-nowrap">
               {['learning', 'certificates', 'history', 'settings'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-4 text-base font-bold transition-colors ${
+                  className={`py-3 md:py-4 text-sm md:text-base font-bold transition-colors ${
                     activeTab === tab 
                       ? 'text-[#1c1d1f] border-b-4 border-[#1c1d1f]' 
                       : 'text-gray-500 hover:text-[#1c1d1f] border-b-4 border-transparent'
@@ -76,10 +76,10 @@ export default function ProfilePage() {
         </div>
 
         {/* Main Content Area */}
-        <main className="max-w-5xl mx-auto px-6 py-12 w-full text-[#1c1d1f] flex-grow">
+        <main className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12 w-full text-[#1c1d1f] flex-grow">
           {activeTab === 'learning' && (
              <>
-              <h2 className="text-2xl font-bold mb-6 text-left font-serif">All courses</h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-left font-serif">All courses</h2>
 
               {loading ? (
                 <div className="flex py-12 justify-center">
@@ -95,7 +95,7 @@ export default function ProfilePage() {
                   </Link>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {progress.map((p: any) => (
                     <Link 
                       key={p.subject_id}

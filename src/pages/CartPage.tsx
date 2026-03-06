@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import useCartStore from '@/store/cartStore';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
-import { useState } from 'react';
 
 export default function CartPage() {
   const { items, removeItem, getTotal, getOriginalTotal } = useCartStore();
@@ -26,8 +25,8 @@ export default function CartPage() {
   return (      <div className="min-h-screen flex flex-col bg-[#f7f9fa]">
         <Header />
       <main className="flex-grow pt-[72px]">
-        <div className="max-w-5xl mx-auto px-6 py-10">
-          <h1 className="text-4xl font-bold text-[#1c1d1f] mb-8 font-serif">Shopping Cart</h1>
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-10">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1c1d1f] mb-6 md:mb-8 font-serif">Shopping Cart</h1>
 
           {items.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-16 text-center">
@@ -49,9 +48,9 @@ export default function CartPage() {
                 <p className="text-sm font-bold text-gray-500 mb-4">{items.length} Course{items.length > 1 ? 's' : ''} in Cart</p>
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 divide-y divide-gray-100">
                   {items.map((item) => (
-                    <div key={item.id} className="flex items-start gap-4 p-5">
+                    <div key={item.id} className="flex items-start gap-3 md:gap-4 p-4 md:p-5">
                       {/* Thumbnail */}
-                      <div className={`w-32 h-20 rounded overflow-hidden flex-shrink-0 relative bg-gradient-to-br ${item.gradient}`}>
+                      <div className={`w-24 h-16 md:w-32 md:h-20 rounded overflow-hidden flex-shrink-0 relative bg-gradient-to-br ${item.gradient}`}>
                         {item.thumbnail_url ? (
                           <img
                             src={item.thumbnail_url}
@@ -98,7 +97,7 @@ export default function CartPage() {
 
               {/* Checkout Sidebar */}
               <div className="lg:w-[300px] flex-shrink-0">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-[90px]">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 sticky top-[90px]">
                   <h3 className="text-gray-500 font-bold text-sm mb-3">Total:</h3>
                   <p className="text-3xl font-bold text-[#1c1d1f] mb-1">₹{total.toLocaleString('en-IN')}</p>
                   <p className="text-sm text-gray-400 line-through mb-1">₹{originalTotal.toLocaleString('en-IN')}</p>

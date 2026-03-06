@@ -48,19 +48,19 @@ export default function Home() {
             className="absolute inset-0 opacity-[0.04]"
             style={{ backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '28px 28px' }}
           />
-          <div className="max-w-7xl mx-auto px-6 py-16 relative z-10 flex flex-col lg:flex-row items-center gap-12">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 lg:py-16 relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
             {/* Left copy */}
             <div className="flex-1 text-left">
               <span className="inline-block mb-4 text-xs font-bold uppercase tracking-widest text-gray-400 bg-white/10 px-3 py-1 rounded-full">
                 🎓 Learn at your own pace
               </span>
-              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4">
                 Skills for your present<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">
                   and your future.
                 </span>
               </h1>
-              <p className="text-gray-400 text-lg mb-8 max-w-xl">
+              <p className="text-gray-400 text-base md:text-lg mb-8 max-w-xl">
                 World-class courses taught by expert instructors. Start learning today and unlock your potential.
               </p>
               <div className="flex flex-wrap gap-3">
@@ -89,14 +89,14 @@ export default function Home() {
             </div>
 
             {/* Stats strip */}
-            <div className="lg:w-auto grid grid-cols-2 gap-4">
+            <div className="w-full lg:w-auto grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 md:gap-4 mt-4 lg:mt-0">
               {stats.map((s) => (
                 <div
                   key={s.label}
                   className="bg-white/5 border border-white/10 rounded-lg px-6 py-4 text-center"
                 >
-                  <div className="text-2xl font-black text-white">{s.value}</div>
-                  <div className="text-xs text-gray-400 mt-1">{s.label}</div>
+                  <div className="text-xl md:text-2xl font-black text-white">{s.value}</div>
+                  <div className="text-[10px] md:text-xs text-gray-400 mt-1 uppercase tracking-wider">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -104,8 +104,8 @@ export default function Home() {
         </section>
 
         {/* ── Courses ── */}
-        <section id="courses" className="max-w-7xl mx-auto px-6 py-14 w-full text-[#1c1d1f]">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-8">
+        <section id="courses" className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-14 w-full text-[#1c1d1f]">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-2 md:gap-4 mb-6 md:mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-black mb-1">
                 All courses

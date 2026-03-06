@@ -144,11 +144,11 @@ export default function CoursePage() {
 
       {/* Dark Hero Banner */}
       <div className="bg-[#1c1d1f] pt-[72px]">
-        <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col lg:flex-row gap-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10 flex flex-col lg:flex-row gap-6 md:gap-8">
           {/* Left: Course Info */}
           <div className="flex-1 text-white text-left">
-            <h1 className="text-3xl font-bold mb-4 leading-tight">{subject?.title}</h1>
-            <p className="text-lg text-gray-300 mb-4 max-w-xl">
+            <h1 className="text-2xl md:text-3xl font-bold mb-4 leading-tight">{subject?.title}</h1>
+            <p className="text-base md:text-lg text-gray-300 mb-4 max-w-xl">
               {subject?.description || 'Master the fundamentals and advanced concepts with hands-on projects and real-world examples.'}
             </p>
 
@@ -289,8 +289,8 @@ export default function CoursePage() {
       </div>
 
       {/* Course Content Section */}
-      <div className="max-w-7xl mx-auto px-6 py-12 w-full text-left">
-        <h2 className="text-2xl font-bold text-[#1c1d1f] mb-2">Course content</h2>
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 w-full text-left">
+        <h2 className="text-xl md:text-2xl font-bold text-[#1c1d1f] mb-2">Course content</h2>
         <p className="text-sm text-gray-500 mb-6">
           {sections.length} sections • {totalVideos} lectures • {fakeHours}h total length
         </p>
@@ -322,8 +322,8 @@ export default function CoursePage() {
         </div>
 
         {/* What you'll learn */}
-        <div className="mt-12 border border-gray-200 rounded-lg p-8">
-          <h2 className="text-2xl font-bold text-[#1c1d1f] mb-5">What you'll learn</h2>
+        <div className="mt-8 md:mt-12 border border-gray-200 rounded-lg p-5 md:p-8">
+          <h2 className="text-xl md:text-2xl font-bold text-[#1c1d1f] mb-4 md:mb-5">What you'll learn</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[
               'Build real-world projects from scratch',
