@@ -21,6 +21,11 @@ export default function VideoPage() {
   const progressInterval = useRef<any>(null);
   const autoPlayTimerRef = useRef<any>(null);
   const playerRef = useRef<any>(null);
+  const videoDataRef = useRef<any>(null);
+
+  useEffect(() => {
+    videoDataRef.current = videoData;
+  }, [videoData]);
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -78,14 +83,14 @@ export default function VideoPage() {
         is_completed: isFinished
       });
 
-      // Only trigger once — when video goes from incomplete to complete
-      if (isFinished && !completionMarked) {
-        setCompletionMarked(true);
-        markVideoCompleted(parsedVideoId);
-        // Trigger autoplay here, NOT in onVideoEnd, to avoid stale closure issues
-        // with the YouTube player re-using the original registered handler.
-        if (videoData?.next_video_id) {
-          setAutoPlayCountdown(5);
+      if (isFinished) {
+        if (!completionMarked) {
+          setCompletionMarked(true);
+          markVideoCompleted(parsedVideoId);
+        }
+        
+        if (videoDataRef.current?.next_video_id) {
+          setAutoPlayCountdown(prev => prev === null ? 5 : prev);
         }
       }
     } catch (error) {
