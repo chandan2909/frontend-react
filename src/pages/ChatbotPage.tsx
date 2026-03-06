@@ -70,34 +70,42 @@ export default function ChatbotPage() {
   const loadChats = useCallback(async () => {
     if (isAuthenticated && user) {
       setSyncing(true);
+      let serverChats: Chat[] = [];
+
       try {
         const { data } = await apiClient.get('/chats');
-        const serverChats: Chat[] = data;
-        if (serverChats.length === 0) {
-          // Bootstrap a new empty chat
-          const fresh = createLocalChat();
-          fresh.messages = [DEFAULT_MSG];
-          setChats([fresh]);
-          setActiveChatId(fresh.id);
-          // Persist to backend
+        serverChats = data as Chat[];
+      } catch {
+        // GET failed — fall back to guest chats so user isn't blocked
+        const local = loadGuestChats();
+        setChats(local);
+        setActiveChatId(local[0].id);
+        setSyncing(false);
+        return;
+      }
+
+      // GET succeeded — now decide what to show
+      if (serverChats.length === 0) {
+        // Bootstrap a fresh chat on the backend
+        const fresh = createLocalChat();
+        fresh.messages = [DEFAULT_MSG];
+        setChats([fresh]);
+        setActiveChatId(fresh.id);
+        // Attempt to persist; if this fails the upsert in addMessage will self-heal
+        try {
           await apiClient.post('/chats', {
             id: fresh.id,
             title: fresh.title,
             createdAt: fresh.createdAt,
             initialMessage: DEFAULT_MSG,
           });
-        } else {
-          setChats(serverChats);
-          setActiveChatId(serverChats[0].id);
-        }
-      } catch {
-        // Fallback to local
-        const local = loadGuestChats();
-        setChats(local);
-        setActiveChatId(local[0].id);
-      } finally {
-        setSyncing(false);
+        } catch { /* self-heals on first message via INSERT IGNORE */ }
+      } else {
+        setChats(serverChats);
+        setActiveChatId(serverChats[0].id);
       }
+
+      setSyncing(false);
     } else {
       // Guest mode
       const local = loadGuestChats();
