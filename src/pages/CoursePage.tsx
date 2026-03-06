@@ -183,11 +183,20 @@ export default function CoursePage() {
           <div className="lg:w-[380px] flex-shrink-0">
             <div className="bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-200">
               {/* Thumbnail */}
-              <div className={`w-full aspect-video bg-gradient-to-br ${getGradient(parsedId)} flex items-center justify-center`}>
-                <svg className="w-16 h-16 text-white opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className={`w-full aspect-video bg-gradient-to-br ${getGradient(parsedId)} relative overflow-hidden`}>
+                {subject?.thumbnail_url ? (
+                  <img
+                    src={subject.thumbnail_url}
+                    alt={subject?.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
+                ) : (
+                  <svg className="w-16 h-16 text-white opacity-60 absolute inset-0 m-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
               </div>
 
               <div className="p-6">

@@ -144,10 +144,26 @@ export default function Home() {
                   to={`/course/${subject.id}`}
                   className="group flex flex-col bg-white border border-gray-200 hover:border-[#1c1d1f] hover:shadow-lg transition-all duration-200 text-left overflow-hidden"
                 >
-                  {/* Blank Thumbnail with subtle icon */}
-                  <div className="w-full aspect-video bg-[#2d2f31] flex flex-col items-center justify-center relative overflow-hidden">
-                     <svg className="w-12 h-12 text-white opacity-20 z-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                     <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity z-10"></div>
+                  {/* Thumbnail */}
+                  <div className="w-full aspect-video bg-[#2d2f31] relative overflow-hidden">
+                    {subject.thumbnail_url ? (
+                      <img
+                        src={subject.thumbnail_url}
+                        alt={subject.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="absolute inset-0 flex flex-col items-center justify-center"
+                      style={{ display: subject.thumbnail_url ? 'none' : 'flex' }}
+                    >
+                      <svg className="w-12 h-12 text-white opacity-20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity z-10"></div>
                   </div>
 
                   {/* Body */}
