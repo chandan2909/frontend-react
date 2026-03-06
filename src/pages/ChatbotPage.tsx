@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Client } from '@gradio/client';
 import ChatMessage from '@/components/Chat/ChatMessage';
+import useAuthStore from '@/store/authStore';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -14,7 +15,6 @@ interface Chat {
   createdAt: number;
 }
 
-const STORAGE_KEY = 'kodemy_chats_v2';
 const DEFAULT_MSG: Message = {
   role: 'assistant',
   content: 'Hello! I am the Kodemy AI Assistant. How can I help you with your learning today?'
@@ -29,9 +29,9 @@ function createNewChat(): Chat {
   };
 }
 
-function loadChats(): Chat[] {
+function loadChats(key: string): Chat[] {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(key);
     if (saved) {
       const parsed = JSON.parse(saved) as Chat[];
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -40,15 +40,18 @@ function loadChats(): Chat[] {
   return [createNewChat()];
 }
 
-function saveChats(chats: Chat[]) {
+function saveChats(key: string, chats: Chat[]) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
+    localStorage.setItem(key, JSON.stringify(chats));
   } catch {}
 }
 
 export default function ChatbotPage() {
-  const [chats, setChats] = useState<Chat[]>(loadChats);
-  const [activeChatId, setActiveChatId] = useState<string>(() => loadChats()[0].id);
+  const { user } = useAuthStore();
+  const storageKey = `kodemy_chats_v2_${user?.id || 'guest'}`;
+
+  const [chats, setChats] = useState<Chat[]>(() => loadChats(storageKey));
+  const [activeChatId, setActiveChatId] = useState<string>(() => loadChats(storageKey)[0].id);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -58,10 +61,17 @@ export default function ChatbotPage() {
 
   const activeChat = chats.find(c => c.id === activeChatId) ?? chats[0];
 
+  // Reload chats if user logs in/out
+  useEffect(() => {
+    const freshChats = loadChats(storageKey);
+    setChats(freshChats);
+    setActiveChatId(freshChats[0].id);
+  }, [storageKey]);
+
   // Persist chats when they change
   useEffect(() => {
-    saveChats(chats);
-  }, [chats]);
+    saveChats(storageKey, chats);
+  }, [chats, storageKey]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
