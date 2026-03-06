@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import useAuthStore from '@/store/authStore';
+import { PlayCircle, Award } from 'lucide-react';
 
 export default function ProfilePage() {
   const [progress, setProgress] = useState<any[]>([]);
@@ -138,7 +139,7 @@ export default function ProfilePage() {
                             }}
                           />
                         ) : (
-                          <svg className="w-12 h-12 text-white opacity-50 absolute inset-0 m-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                          <PlayCircle className="w-12 h-12 text-white opacity-50 absolute inset-0 m-auto" />
                         )}
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity z-10"></div>
                       </div>
@@ -175,7 +176,7 @@ export default function ProfilePage() {
 
           {activeTab === 'certificates' && (
              <div className="bg-white border border-gray-200 rounded p-12 text-center text-gray-500 font-medium">
-                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                <Award className="w-16 h-16 mx-auto text-gray-300 mb-4" />
                 <p>No certificates earned yet.</p>
                 <p className="text-sm mt-2 text-gray-400">Complete 100% of a course to earn its certificate.</p>
              </div>
@@ -210,7 +211,7 @@ export default function ProfilePage() {
                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                                />
                              ) : (
-                               <svg className="w-8 h-8 text-white opacity-50 absolute inset-0 m-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                               <PlayCircle className="w-8 h-8 text-white opacity-50 absolute inset-0 m-auto" />
                              )}
                           </div>
                           

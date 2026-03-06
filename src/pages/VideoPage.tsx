@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import apiClient from '@/lib/apiClient';
 import VideoPlayer from '@/components/Video/VideoPlayer';
 import useSidebarStore from '@/store/sidebarStore';
+import { Play, Lock, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 
 export default function VideoPage() {
   const { subjectId, videoId } = useParams();
@@ -142,9 +143,7 @@ export default function VideoPage() {
         <div className="text-center">
           <div className="bg-[#2d2f31] p-10 rounded-lg mb-6 max-w-lg border border-gray-700 shadow-xl">
              <div className="flex justify-center mb-6">
-                <svg className="w-16 h-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+                <Lock className="w-16 h-16 text-gray-500" />
              </div>
              <h2 className="text-2xl font-bold text-white mb-3">
                 {isLocked ? 'This lesson is locked' : 'Video not found'}
@@ -184,9 +183,7 @@ export default function VideoPage() {
               className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[#1c1d1f] hover:bg-gray-800 text-white transition-all transform hover:scale-110 shadow-2xl border border-white/10"
               title="Previous Lesson"
             >
-              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           )}
 
@@ -202,9 +199,7 @@ export default function VideoPage() {
               }`}
               title={completionMarked ? 'Next Lesson' : 'Complete lesson to unlock'}
             >
-              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           )}
 

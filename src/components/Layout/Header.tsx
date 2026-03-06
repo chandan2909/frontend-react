@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import HeaderActions from './HeaderActions';
 import useCartStore from '@/store/cartStore';
 import { useState } from 'react';
+import { Menu, X, Home as HomeIcon, ShoppingCart } from 'lucide-react';
 
 export default function Header() {
   const itemCount = useCartStore((s) => s.items.length);
@@ -17,9 +18,7 @@ export default function Header() {
         onClick={() => setMobileMenuOpen(true)}
         aria-label="Open Menu"
       >
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+        <Menu className="w-6 h-6" />
       </button>
 
       <Link to="/" className="flex-shrink-0 text-[24px] md:text-[28px] font-black tracking-tighter text-[#1c1d1f] font-serif decoration-none">
@@ -41,9 +40,7 @@ export default function Header() {
           title="Home" 
           aria-label="Home"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-          </svg>
+          <HomeIcon className="w-6 h-6" />
         </Link>
         
         {/* Cart Button */}
@@ -53,9 +50,7 @@ export default function Header() {
           title="Cart" 
           aria-label="Cart"
         >
-          <svg className="w-6 h-6 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
+          <ShoppingCart className="w-6 h-6 md:w-6 md:h-6" />
           {itemCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-[#a435f0] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
               {itemCount}
@@ -74,9 +69,7 @@ export default function Header() {
              <div className="p-4 border-b border-gray-200 flex justify-between items-center h-[72px]">
                <span className="font-serif font-black text-[24px] tracking-tighter text-[#1c1d1f]">Kodemy</span>
                <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu" className="p-2 -mr-2 text-[#1c1d1f]">
-                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                 </svg>
+                 <X className="w-6 h-6" />
                </button>
              </div>
              <div className="p-4 flex flex-col gap-4">

@@ -5,6 +5,7 @@ import useAuthStore from '@/store/authStore';
 import useCartStore from '@/store/cartStore';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
+import { Star, Clock, Globe, PlayCircle, MonitorPlay, FileText, Tv, Award, ChevronDown, Check } from 'lucide-react';
 
 export default function CoursePage() {
   const { subjectId } = useParams();
@@ -156,9 +157,7 @@ export default function CoursePage() {
               <span className="text-[#f3ca8c] font-bold text-lg">{fakeRating}</span>
               <div className="flex text-[#f3ca8c]">
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
+                  <Star key={i} className="w-4 h-4 fill-current text-[#f3ca8c]" />
                 ))}
               </div>
               <span className="text-[#c0c4cc] text-sm">({fakeStudents.toLocaleString()} students)</span>
@@ -169,11 +168,11 @@ export default function CoursePage() {
             </p>
             <div className="flex items-center gap-4 text-sm text-gray-400 mt-2">
               <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <Clock className="w-4 h-4" />
                 Last updated 2026
               </span>
               <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                <Globe className="w-4 h-4" />
                 English
               </span>
             </div>
@@ -192,10 +191,7 @@ export default function CoursePage() {
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />
                 ) : (
-                  <svg className="w-16 h-16 text-white opacity-60 absolute inset-0 m-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <PlayCircle className="w-16 h-16 text-white opacity-60 absolute inset-0 m-auto" />
                 )}
               </div>
 
@@ -211,7 +207,7 @@ export default function CoursePage() {
 
                 {/* Timer */}
                 <p className="text-sm text-red-600 font-medium mb-4 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <Clock className="w-4 h-4" />
                   <span className="font-bold">2 days</span> left at this price!
                 </p>
 
@@ -265,19 +261,19 @@ export default function CoursePage() {
                   <h4 className="font-bold text-sm text-[#1c1d1f] mb-3">This course includes:</h4>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                      <MonitorPlay className="w-4 h-4 flex-shrink-0" />
                       {fakeHours} hours on-demand video
                     </li>
                     <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                      <FileText className="w-4 h-4 flex-shrink-0" />
                       {fakeLectures} downloadable resources
                     </li>
                     <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                      <Tv className="w-4 h-4 flex-shrink-0" />
                       Access on mobile and TV
                     </li>
                     <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                      <Award className="w-4 h-4 flex-shrink-0" />
                       Certificate of completion
                     </li>
                   </ul>
@@ -303,7 +299,7 @@ export default function CoursePage() {
               <div key={section.id} className={idx > 0 ? 'border-t border-gray-200' : ''}>
                 <div className="bg-[#f7f9fa] px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-gray-100">
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>
+                    <ChevronDown className="w-4 h-4 text-gray-600" />
                     <span className="font-bold text-sm text-[#1c1d1f]">{section.title}</span>
                   </div>
                   <span className="text-xs text-gray-500">{section.videos?.length || 0} lectures</span>
@@ -311,7 +307,7 @@ export default function CoursePage() {
                 <div className="bg-white">
                   {section.videos?.map((video: any) => (
                     <div key={video.id} className="flex items-center gap-3 px-8 py-3 text-sm text-gray-700 border-t border-gray-100">
-                      <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                      <PlayCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
                       <span>{video.title}</span>
                     </div>
                   ))}
@@ -334,7 +330,7 @@ export default function CoursePage() {
               'Prepare for technical interviews',
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2 text-sm text-[#1c1d1f]">
-                <svg className="w-5 h-5 text-[#1c1d1f] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>
+                <Check className="w-5 h-5 text-[#1c1d1f] flex-shrink-0 mt-0.5" />
                 {item}
               </div>
             ))}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
+import { Check, Lock } from 'lucide-react';
 
 interface LocationState {
   amount: number;
@@ -133,9 +134,7 @@ export default function CheckoutPage() {
         <div className="flex-grow flex flex-col items-center justify-center pt-[72px] px-6">
           <div className="bg-white border border-gray-200 rounded-lg p-12 text-center max-w-md w-full shadow-sm">
             <div className="w-20 h-20 bg-green-50 border border-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
+              <Check className="w-10 h-10 text-green-500" />
             </div>
             <h1 className="text-2xl font-bold text-[#1c1d1f] font-serif mb-2">Payment Successful!</h1>
             <p className="text-gray-500 mb-1">₹{amount.toLocaleString('en-IN')} paid to Kodemy</p>
@@ -243,7 +242,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                     <p className="text-xs text-gray-400 flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                      <Lock className="w-3.5 h-3.5" />
                       Your card details are encrypted with 256-bit SSL
                     </p>
                   </div>
@@ -354,7 +353,7 @@ export default function CheckoutPage() {
 
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1.5">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <Lock className="w-3.5 h-3.5" />
                     256-bit SSL Encryption · 30-day refund guarantee
                   </p>
                   <div className="flex items-center justify-center gap-2 mt-3">

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import useCartStore from '@/store/cartStore';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
+import { ShoppingCart, PlayCircle, Star } from 'lucide-react';
 
 export default function CartPage() {
   const { items, removeItem, getTotal, getOriginalTotal } = useCartStore();
@@ -30,9 +31,7 @@ export default function CartPage() {
 
           {items.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-16 text-center">
-              <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <ShoppingCart className="w-20 h-20 text-gray-300 mx-auto mb-4" />
               <p className="text-lg text-gray-500 mb-4">Your cart is empty.</p>
               <button
                 onClick={() => navigate('/')}
@@ -59,9 +58,7 @@ export default function CartPage() {
                             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                           />
                         ) : (
-                          <svg className="w-8 h-8 text-white opacity-50 absolute inset-0 m-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          </svg>
+                          <PlayCircle className="w-8 h-8 text-white opacity-50 absolute inset-0 m-auto" />
                         )}
                       </div>
 
@@ -73,7 +70,7 @@ export default function CartPage() {
                           <span className="text-sm font-bold text-[#b4690e]">4.8</span>
                           <div className="flex text-[#b4690e]">
                             {[...Array(5)].map((_, i) => (
-                              <svg key={i} className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                              <Star key={i} className="w-3 h-3 fill-current" />
                             ))}
                           </div>
                         </div>

@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { Lock, CheckCircle, PlayCircle } from 'lucide-react';
 
 interface SectionItemProps {
   section: any;
@@ -25,9 +26,7 @@ export default function SectionItem({ section, subjectId }: SectionItemProps) {
                 title="Complete previous videos to unlock"
               >
                 <div className="flex-shrink-0">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+                  <Lock className="w-4 h-4" />
                 </div>
                 <span className="truncate">{video.title}</span>
               </div>
@@ -46,17 +45,13 @@ export default function SectionItem({ section, subjectId }: SectionItemProps) {
             >
               <div className="flex-shrink-0">
                 {video.is_completed ? (
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+                  <CheckCircle className="w-4 h-4 text-green-500" />
                 ) : isActive ? (
                   <div className="w-4 h-4 flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
                   </div>
                 ) : (
-                  <svg className="w-4 h-4 shrink-0 text-black fill-current" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                  <PlayCircle className="w-4 h-4 shrink-0 text-black" />
                 )}
               </div>
               <span className="truncate">{video.title}</span>
