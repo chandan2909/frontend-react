@@ -25,19 +25,17 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
     return (
       <nav className={`flex ${isMobile ? 'flex-col items-start gap-4' : 'items-center gap-3'}`}>
         {isMobile && user && (
-           <Link 
-             to="/profile" 
-             onClick={closeMenu}
-             className="flex items-center gap-3 w-full pb-4 border-b border-gray-100 mb-2 hover:bg-gray-50 transition-colors p-2 rounded-lg"
+          <div 
+             className="flex items-center gap-3 w-full pb-4 border-b border-gray-100 mb-2 p-2 rounded-lg"
            >
              <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-bold text-xl flex-shrink-0">
                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
              </div>
              <div>
-               <p className="font-bold text-[#1c1d1f] hover:text-[#5624d0]">{user.name}</p>
+               <p className="font-bold text-[#1c1d1f]">{user.name}</p>
                <p className="text-xs text-gray-500">{user.email}</p>
              </div>
-           </Link>
+           </div>
         )}
         {!isMobile && (
           <Link to="/" onClick={closeMenu} className={`text-sm font-bold px-4 py-2 rounded-full transition-all ${isActive('/') ? 'bg-[#1c1d1f] text-white' : 'text-[#1c1d1f] hover:bg-gray-100'}`}>
@@ -52,15 +50,15 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
           <span className="text-base leading-none">✨</span> AI Assistant
         </Link>
         <Link to="/profile" onClick={closeMenu} className={`text-sm font-bold transition-all ${isMobile ? 'w-full py-2 px-3 rounded-lg' : 'px-4 py-2 rounded-full'} ${isActive('/profile') ? 'bg-[#1c1d1f] text-white' : 'text-[#1c1d1f] hover:bg-gray-100'}`}>
-          My learning
+          My profile
         </Link>
         <button onClick={handleLogout} className={`text-sm font-bold text-[#1c1d1f] hover:bg-gray-100 transition-all text-left ${isMobile ? 'w-full py-2 px-3 rounded-lg' : 'px-4 py-2 rounded-full'}`}>
           Logout
         </button>
         {!isMobile && (
-          <Link to="/profile" className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold ml-2">
+          <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold ml-2">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-          </Link>
+          </div>
         )}
       </nav>
     );
