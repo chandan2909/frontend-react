@@ -36,9 +36,11 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
              </div>
            </Link>
         )}
-        <Link to="/" onClick={closeMenu} className={`text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] ${isMobile ? 'w-full py-2' : 'px-3'}`}>
-          Home
-        </Link>
+        {!isMobile && (
+          <Link to="/" onClick={closeMenu} className="text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] px-3">
+            Home
+          </Link>
+        )}
         <Link 
           to="/chat" 
           onClick={closeMenu}
@@ -63,9 +65,11 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
 
   return (
     <nav className={`flex ${isMobile ? 'flex-col items-stretch gap-4' : 'items-center gap-2'}`}>
-      <Link to="/" onClick={closeMenu} className={`text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] ${isMobile ? 'w-full py-2' : 'px-3 mr-2'}`}>
-        Home
-      </Link>
+      {!isMobile && (
+        <Link to="/" onClick={closeMenu} className="text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] px-3 mr-2">
+          Home
+        </Link>
+      )}
       <Link 
         to="/chat" 
         onClick={closeMenu}
