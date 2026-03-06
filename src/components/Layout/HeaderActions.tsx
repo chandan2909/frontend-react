@@ -22,15 +22,19 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
     return (
       <nav className={`flex ${isMobile ? 'flex-col items-start gap-4' : 'items-center gap-3'}`}>
         {isMobile && user && (
-           <div className="flex items-center gap-3 w-full pb-4 border-b border-gray-100 mb-2">
-             <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-bold text-xl">
+           <Link 
+             to="/profile" 
+             onClick={closeMenu}
+             className="flex items-center gap-3 w-full pb-4 border-b border-gray-100 mb-2 hover:bg-gray-50 transition-colors p-2 rounded-lg"
+           >
+             <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-bold text-xl flex-shrink-0">
                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
              </div>
              <div>
-               <p className="font-bold text-[#1c1d1f]">{user.name}</p>
+               <p className="font-bold text-[#1c1d1f] hover:text-[#5624d0]">{user.name}</p>
                <p className="text-xs text-gray-500">{user.email}</p>
              </div>
-           </div>
+           </Link>
         )}
         <Link 
           to="/chat" 
