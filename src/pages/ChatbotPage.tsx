@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Client } from '@gradio/client';
+import { getGradioClient, warmGradioClient } from '@/lib/gradioClient';
 import ChatMessage from '@/components/Chat/ChatMessage';
 import useAuthStore from '@/store/authStore';
 import apiClient from '@/lib/apiClient';
@@ -119,6 +119,11 @@ export default function ChatbotPage() {
     }
   }, [isAuthenticated, user]);
 
+  // Pre-warm the Gradio connection as soon as the page mounts
+  useEffect(() => {
+    warmGradioClient();
+  }, []);
+
   useEffect(() => {
     loadChats();
   }, [loadChats]);
@@ -219,8 +224,8 @@ export default function ChatbotPage() {
 
     let aiText = "Sorry, I couldn't process your request.";
     try {
-      const client = await Client.connect("Spoidermon29/lms-ai-assistant");
-      const result = await client.predict("/respond", { message: userMsg });
+      const client = await getGradioClient();
+      const result = await client.predict('/respond', { message: userMsg });
       const data = result.data;
       if (typeof data === 'string') {
         aiText = data;
