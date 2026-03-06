@@ -3,6 +3,7 @@ import HeaderActions from './HeaderActions';
 import useCartStore from '@/store/cartStore';
 import { useState } from 'react';
 import { Menu, X, Home as HomeIcon, ShoppingCart } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
   const itemCount = useCartStore((s) => s.items.length);
@@ -62,29 +63,43 @@ export default function Header() {
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setMobileMenuOpen(false)}></div>
-          <div className="fixed top-0 left-0 bottom-0 w-64 bg-white z-[70] shadow-xl overflow-y-auto">
-             <div className="p-4 border-b border-gray-200 flex justify-between items-center h-[72px]">
-               <span className="font-serif font-black text-[24px] tracking-tighter text-[#1c1d1f]">Kodemy</span>
-               <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu" className="p-2 -mr-2 text-[#1c1d1f]">
-                 <X className="w-6 h-6" />
-               </button>
-             </div>
-             <div className="p-4 flex flex-col gap-4">
-               <Link 
-                 to="/chat" 
-                 onClick={() => setMobileMenuOpen(false)}
-                 className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold bg-[#1c1d1f] text-white rounded hover:bg-black transition-colors"
-               >
-                 <span className="text-base leading-none relative top-[-1px]">✨</span> AI Assistant
-               </Link>
-               <HeaderActions isMobile={true} closeMenu={() => setMobileMenuOpen(false)} />
-             </div>
-          </div>
-        </>
-      )}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-[60]" 
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <motion.div 
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+              className="fixed top-0 left-0 bottom-0 w-64 bg-white z-[70] shadow-xl overflow-y-auto"
+            >
+               <div className="p-4 border-b border-gray-200 flex justify-between items-center h-[72px]">
+                 <span className="font-serif font-black text-[24px] tracking-tighter text-[#1c1d1f]">Kodemy</span>
+                 <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu" className="p-2 -mr-2 text-[#1c1d1f]">
+                   <X className="w-6 h-6" />
+                 </button>
+               </div>
+               <div className="p-4 flex flex-col gap-4">
+                 <Link 
+                   to="/chat" 
+                   onClick={() => setMobileMenuOpen(false)}
+                   className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold bg-[#1c1d1f] text-white rounded hover:bg-black transition-colors"
+                 >
+                   <span className="text-base leading-none relative top-[-1px]">✨</span> AI Assistant
+                 </Link>
+                 <HeaderActions isMobile={true} closeMenu={() => setMobileMenuOpen(false)} />
+               </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
