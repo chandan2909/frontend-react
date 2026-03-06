@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Client } from '@gradio/client';
 import ChatMessage from '@/components/Chat/ChatMessage';
 import useAuthStore from '@/store/authStore';
+import apiClient from '@/lib/apiClient';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -20,7 +21,7 @@ const DEFAULT_MSG: Message = {
   content: 'Hello! I am the Kodemy AI Assistant. How can I help you with your learning today?'
 };
 
-function createNewChat(): Chat {
+function createLocalChat(): Chat {
   return {
     id: crypto.randomUUID(),
     title: 'New Chat',
@@ -29,31 +30,35 @@ function createNewChat(): Chat {
   };
 }
 
-function loadChats(key: string): Chat[] {
+// --- Guest mode helpers (localStorage only) ---
+function getGuestKey() { return 'kodemy_guest_chats_v3'; }
+
+function loadGuestChats(): Chat[] {
   try {
-    const saved = localStorage.getItem(key);
+    const saved = localStorage.getItem(getGuestKey());
     if (saved) {
       const parsed = JSON.parse(saved) as Chat[];
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch {}
-  return [createNewChat()];
+  return [createLocalChat()];
 }
 
-function saveChats(key: string, chats: Chat[]) {
+function saveGuestChats(chats: Chat[]) {
   try {
-    localStorage.setItem(key, JSON.stringify(chats));
+    localStorage.setItem(getGuestKey(), JSON.stringify(chats));
   } catch {}
 }
+// -----------------------------------------------
 
 export default function ChatbotPage() {
-  const { user } = useAuthStore();
-  const storageKey = `kodemy_chats_v2_${user?.id || 'guest'}`;
+  const { user, isAuthenticated } = useAuthStore();
 
-  const [chats, setChats] = useState<Chat[]>(() => loadChats(storageKey));
-  const [activeChatId, setActiveChatId] = useState<string>(() => loadChats(storageKey)[0].id);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [activeChatId, setActiveChatId] = useState<string>('');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -61,40 +66,90 @@ export default function ChatbotPage() {
 
   const activeChat = chats.find(c => c.id === activeChatId) ?? chats[0];
 
-  // Reload chats if user logs in/out
-  useEffect(() => {
-    const freshChats = loadChats(storageKey);
-    setChats(freshChats);
-    setActiveChatId(freshChats[0].id);
-  }, [storageKey]);
+  // Load chats on mount / user change
+  const loadChats = useCallback(async () => {
+    if (isAuthenticated && user) {
+      setSyncing(true);
+      try {
+        const { data } = await apiClient.get('/chats');
+        const serverChats: Chat[] = data;
+        if (serverChats.length === 0) {
+          // Bootstrap a new empty chat
+          const fresh = createLocalChat();
+          fresh.messages = [DEFAULT_MSG];
+          setChats([fresh]);
+          setActiveChatId(fresh.id);
+          // Persist to backend
+          await apiClient.post('/chats', {
+            id: fresh.id,
+            title: fresh.title,
+            createdAt: fresh.createdAt,
+            initialMessage: DEFAULT_MSG,
+          });
+        } else {
+          setChats(serverChats);
+          setActiveChatId(serverChats[0].id);
+        }
+      } catch {
+        // Fallback to local
+        const local = loadGuestChats();
+        setChats(local);
+        setActiveChatId(local[0].id);
+      } finally {
+        setSyncing(false);
+      }
+    } else {
+      // Guest mode
+      const local = loadGuestChats();
+      setChats(local);
+      setActiveChatId(local[0].id);
+    }
+  }, [isAuthenticated, user]);
 
-  // Persist chats when they change
   useEffect(() => {
-    saveChats(storageKey, chats);
-  }, [chats, storageKey]);
+    loadChats();
+  }, [loadChats]);
 
-  // Scroll to bottom when messages change
+  // Persist guest chats to localStorage
+  useEffect(() => {
+    if (!isAuthenticated) {
+      saveGuestChats(chats);
+    }
+  }, [chats, isAuthenticated]);
+
+  // Scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeChat?.messages, loading]);
 
-  const updateActiveChat = (updater: (chat: Chat) => Chat) => {
-    setChats(prev => prev.map(c => c.id === activeChatId ? updater(c) : c));
-  };
+  // --- Chat actions ---
 
-  const handleNewChat = () => {
-    const newChat = createNewChat();
+  const handleNewChat = async () => {
+    const newChat = createLocalChat();
+    newChat.messages = [DEFAULT_MSG];
+
     setChats(prev => [newChat, ...prev]);
     setActiveChatId(newChat.id);
     setInput('');
+
+    if (isAuthenticated) {
+      try {
+        await apiClient.post('/chats', {
+          id: newChat.id,
+          title: newChat.title,
+          createdAt: newChat.createdAt,
+          initialMessage: DEFAULT_MSG,
+        });
+      } catch { /* ignore */ }
+    }
   };
 
-  const handleDeleteChat = (id: string, e: React.MouseEvent) => {
+  const handleDeleteChat = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setChats(prev => {
       const remaining = prev.filter(c => c.id !== id);
       if (remaining.length === 0) {
-        const fresh = createNewChat();
+        const fresh = createLocalChat();
         setActiveChatId(fresh.id);
         return [fresh];
       }
@@ -103,6 +158,16 @@ export default function ChatbotPage() {
       }
       return remaining;
     });
+
+    if (isAuthenticated) {
+      try {
+        await apiClient.delete(`/chats/${id}`);
+      } catch { /* ignore */ }
+    }
+  };
+
+  const updateLocalChat = (chatIdToUpdate: string, updater: (chat: Chat) => Chat) => {
+    setChats(prev => prev.map(c => c.id === chatIdToUpdate ? updater(c) : c));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,39 +178,63 @@ export default function ChatbotPage() {
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
-    // Auto-title the chat from the first user message
-    updateActiveChat(chat => ({
+    const chatId = activeChat?.id;
+    if (!chatId) return;
+
+    const isFirstUserMsg = activeChat.messages.length === 1;
+    const newTitle = isFirstUserMsg ? userMsg.slice(0, 40) : activeChat.title;
+    const now = Date.now();
+
+    updateLocalChat(chatId, chat => ({
       ...chat,
-      title: chat.messages.length === 1 ? userMsg.slice(0, 40) : chat.title,
+      title: newTitle,
       messages: [...chat.messages, { role: 'user', content: userMsg }],
     }));
     setLoading(true);
 
+    // Persist user message to backend
+    if (isAuthenticated) {
+      try {
+        await apiClient.post(`/chats/${chatId}/messages`, {
+          role: 'user',
+          content: userMsg,
+          createdAt: now,
+          title: isFirstUserMsg ? newTitle : undefined,
+        });
+      } catch { /* ignore, will still work locally */ }
+    }
+
+    let aiText = "Sorry, I couldn't process your request.";
     try {
       const client = await Client.connect("Spoidermon29/lms-ai-assistant");
       const result = await client.predict("/respond", { message: userMsg });
       const data = result.data;
-      let aiText = "Sorry, I couldn't process your request.";
       if (typeof data === 'string') {
         aiText = data;
       } else if (Array.isArray(data) && data.length > 0) {
         aiText = typeof data[0] === 'string' ? data[0] : JSON.stringify(data[0]);
       }
-      updateActiveChat(chat => ({
-        ...chat,
-        messages: [...chat.messages, { role: 'assistant', content: aiText }],
-      }));
     } catch {
-      updateActiveChat(chat => ({
-        ...chat,
-        messages: [...chat.messages, {
-          role: 'assistant',
-          content: "Sorry, I'm having trouble connecting to the AI server right now. Please try again."
-        }],
-      }));
-    } finally {
-      setLoading(false);
+      aiText = "Sorry, I'm having trouble connecting to the AI server right now. Please try again.";
     }
+
+    updateLocalChat(chatId, chat => ({
+      ...chat,
+      messages: [...chat.messages, { role: 'assistant', content: aiText }],
+    }));
+
+    // Persist AI response to backend
+    if (isAuthenticated) {
+      try {
+        await apiClient.post(`/chats/${chatId}/messages`, {
+          role: 'assistant',
+          content: aiText,
+          createdAt: Date.now(),
+        });
+      } catch { /* ignore */ }
+    }
+
+    setLoading(false);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -158,11 +247,10 @@ export default function ChatbotPage() {
     <div className="flex h-screen bg-white font-sans overflow-hidden">
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} flex-shrink-0 bg-[#1c1d1f] flex flex-col overflow-hidden transition-all duration-300`}>
-        {/* Sidebar Header */}
         <div className="px-3 pt-4 pb-2 flex items-center justify-between">
           <span className="text-white font-bold text-sm tracking-wide">✨ Kodemy AI</span>
+          {syncing && <span className="text-xs text-gray-400 animate-pulse">Syncing...</span>}
         </div>
-        {/* New Chat Button */}
         <div className="px-3 pb-3">
           <button
             onClick={handleNewChat}
@@ -174,7 +262,6 @@ export default function ChatbotPage() {
             New Chat
           </button>
         </div>
-        {/* Chat List */}
         <div className="flex-1 overflow-y-auto px-2 space-y-0.5">
           {chats.map(chat => (
             <div
@@ -202,7 +289,11 @@ export default function ChatbotPage() {
             </div>
           ))}
         </div>
-        {/* Back Button at bottom of Sidebar */}
+        {isAuthenticated && (
+          <div className="px-3 pb-2 text-xs text-gray-500 text-center">
+            ☁️ Synced to your account
+          </div>
+        )}
         <div className="p-3 border-t border-white/10">
           <button
             onClick={() => window.history.back()}
@@ -218,7 +309,6 @@ export default function ChatbotPage() {
 
       {/* Main Chat Area */}
       <div className="flex flex-col flex-1 min-w-0">
-        {/* Top Bar */}
         <header className="h-14 border-b border-gray-100 flex items-center px-4 gap-3 flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(p => !p)}
@@ -232,7 +322,10 @@ export default function ChatbotPage() {
           <h1 className="text-base font-semibold text-[#1c1d1f] truncate flex-1">{activeChat?.title ?? 'New Chat'}</h1>
           <button
             title="Clear current chat"
-            onClick={() => updateActiveChat(chat => ({ ...chat, title: 'New Chat', messages: [DEFAULT_MSG] }))}
+            onClick={() => {
+              if (!activeChat) return;
+              updateLocalChat(activeChat.id, chat => ({ ...chat, title: 'New Chat', messages: [DEFAULT_MSG] }));
+            }}
             className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 transition-colors px-2 py-1"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -242,7 +335,6 @@ export default function ChatbotPage() {
           </button>
         </header>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto">
           <div className="pb-44 pt-4">
             {activeChat?.messages.map((msg, i) => (
@@ -264,9 +356,10 @@ export default function ChatbotPage() {
           </div>
         </div>
 
-        {/* Input */}
-        <div className="fixed bottom-0 right-0 bg-gradient-to-t from-white via-white to-transparent pt-8 pb-6 px-4"
-          style={{ left: sidebarOpen ? '256px' : '0px', transition: 'left 0.3s' }}>
+        <div
+          className="fixed bottom-0 right-0 bg-gradient-to-t from-white via-white to-transparent pt-8 pb-6 px-4"
+          style={{ left: sidebarOpen ? '256px' : '0px', transition: 'left 0.3s' }}
+        >
           <div className="max-w-3xl mx-auto">
             <form
               onSubmit={handleSubmit}
