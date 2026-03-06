@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import useAuthStore from '../../store/authStore';
 
@@ -6,6 +6,9 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
   const { isAuthenticated, logout, user } = useAuthStore();
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
 
   // Avoid hydration error (still useful in some React patterns, though less critical than Next.js)
   useEffect(() => setMounted(true), []);
@@ -37,7 +40,7 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
            </Link>
         )}
         {!isMobile && (
-          <Link to="/" onClick={closeMenu} className="text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] px-3">
+          <Link to="/" onClick={closeMenu} className={`text-sm font-bold px-3 transition-colors ${isActive('/') ? 'text-[#5624d0]' : 'text-[#1c1d1f] hover:text-[#5624d0]'}`}>
             Home
           </Link>
         )}
@@ -48,7 +51,7 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
         >
           <span className="text-base leading-none">✨</span> AI Assistant
         </Link>
-        <Link to="/profile" onClick={closeMenu} className={`text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] ${isMobile ? 'w-full py-2' : 'px-3'}`}>
+        <Link to="/profile" onClick={closeMenu} className={`text-sm font-bold transition-colors ${isActive('/profile') ? 'text-[#5624d0]' : 'text-[#1c1d1f] hover:text-[#5624d0]'} ${isMobile ? 'w-full py-2' : 'px-3'}`}>
           My learning
         </Link>
         <button onClick={handleLogout} className={`text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] text-left ${isMobile ? 'w-full py-2' : 'px-3'}`}>
@@ -66,7 +69,7 @@ export default function HeaderActions({ isMobile, closeMenu }: { isMobile?: bool
   return (
     <nav className={`flex ${isMobile ? 'flex-col items-stretch gap-4' : 'items-center gap-2'}`}>
       {!isMobile && (
-        <Link to="/" onClick={closeMenu} className="text-sm font-bold text-[#1c1d1f] hover:text-[#5624d0] px-3 mr-2">
+        <Link to="/" onClick={closeMenu} className={`text-sm font-bold px-3 mr-2 transition-colors ${isActive('/') ? 'text-[#5624d0]' : 'text-[#1c1d1f] hover:text-[#5624d0]'}`}>
           Home
         </Link>
       )}

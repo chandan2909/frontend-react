@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import HeaderActions from './HeaderActions';
 import useCartStore from '@/store/cartStore';
 import { useState } from 'react';
@@ -6,6 +6,9 @@ import { useState } from 'react';
 export default function Header() {
   const itemCount = useCartStore((s) => s.items.length);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <header className="fixed top-0 left-0 right-0 h-[72px] bg-white border-b border-gray-200 z-50 flex items-center px-4 md:px-6 gap-4 md:gap-6 shadow-sm">
@@ -25,14 +28,24 @@ export default function Header() {
 
       <div className="flex items-center gap-2 md:gap-4 flex-shrink-0 ml-auto">
         {/* Mobile Home Button */}
-        <Link to="/" className="md:hidden relative p-2 hover:text-[#a435f0] transition-colors text-[#1c1d1f]" title="Home" aria-label="Home">
+        <Link 
+          to="/" 
+          className={`md:hidden relative p-2 transition-colors ${isActive('/') ? 'text-[#5624d0]' : 'text-[#1c1d1f] hover:text-[#a435f0]'}`}
+          title="Home" 
+          aria-label="Home"
+        >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
           </svg>
         </Link>
         
         {/* Cart Button */}
-        <Link to="/cart" className="relative p-2 hover:text-[#a435f0] transition-colors text-[#1c1d1f]" title="Cart" aria-label="Cart">
+        <Link 
+          to="/cart" 
+          className={`relative p-2 transition-colors ${isActive('/cart') ? 'text-[#5624d0]' : 'text-[#1c1d1f] hover:text-[#a435f0]'}`}
+          title="Cart" 
+          aria-label="Cart"
+        >
           <svg className="w-6 h-6 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
