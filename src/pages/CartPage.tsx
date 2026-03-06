@@ -3,33 +3,36 @@ import useCartStore from '@/store/cartStore';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import { useState } from 'react';
+import CheckoutModal from '@/components/Checkout/CheckoutModal';
 
 export default function CartPage() {
   const { items, removeItem, purchaseAll, getTotal, getOriginalTotal } = useCartStore();
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const total = getTotal();
   const originalTotal = getOriginalTotal();
   const discount = originalTotal > 0 ? Math.round((1 - total / originalTotal) * 100) : 0;
 
-  const handleCheckout = async () => {
-    try {
-      await purchaseAll();
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        navigate('/');
-      }, 2500);
-    } catch (error) {
-      console.error('Checkout failed:', error);
-      alert('Purchase failed. Please ensure you are logged in and try again.');
-    }
+  const handleCheckout = () => {
+    setShowCheckout(true);
+  };
+
+  const handlePaymentSuccess = async () => {
+    await purchaseAll();
+    setShowCheckout(false);
+    setShowSuccess(true);
+    setTimeout(() => {
+      setShowSuccess(false);
+      navigate('/');
+    }, 3000);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f9fa]">
-      <Header />
+    <>
+      <div className="min-h-screen flex flex-col bg-[#f7f9fa]">
+        <Header />
       <main className="flex-grow pt-[72px]">
         <div className="max-w-5xl mx-auto px-6 py-10">
           <h1 className="text-4xl font-bold text-[#1c1d1f] mb-8 font-serif">Shopping Cart</h1>
@@ -143,5 +146,16 @@ export default function CartPage() {
       </main>
       <Footer />
     </div>
+    {/* Razorpay-style checkout modal */}
+    {showCheckout && (
+      <CheckoutModal
+        amount={total}
+        originalAmount={originalTotal}
+        itemCount={items.length}
+        onClose={() => setShowCheckout(false)}
+        onSuccess={handlePaymentSuccess}
+      />
+    )}
+  </>
   );
 }

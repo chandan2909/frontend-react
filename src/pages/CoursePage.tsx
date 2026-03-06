@@ -5,6 +5,7 @@ import useAuthStore from '@/store/authStore';
 import useCartStore from '@/store/cartStore';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
+import CheckoutModal from '@/components/Checkout/CheckoutModal';
 
 export default function CoursePage() {
   const { subjectId } = useParams();
@@ -18,6 +19,7 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   // Track enrollment from backend (source of truth) OR cartStore (optimistic)
   const [enrolled, setEnrolled] = useState(false);
 
@@ -88,21 +90,20 @@ export default function CoursePage() {
     });
   }, [parsedId, isAuthenticated]);
 
-  const handleBuy = async () => {
+  const handleBuy = () => {
     if (!isAuthenticated) {
       navigate(`/auth/login?redirect=/course/${parsedId}`);
       return;
     }
-    
-    try {
-      await purchaseSingle(parsedId);
-      setEnrolled(true); // immediately switch button to "Start Learning"
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    } catch (error) {
-      console.error('Purchase failed:', error);
-      alert('Failed to purchase course. Please try again.');
-    }
+    setShowCheckout(true);
+  };
+
+  const handleBuyPaymentSuccess = async () => {
+    await purchaseSingle(parsedId);
+    setShowCheckout(false);
+    setEnrolled(true);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const handleAddToCart = () => {
@@ -140,6 +141,7 @@ export default function CoursePage() {
   const totalVideos = sections.reduce((acc: number, s: any) => acc + (s.videos?.length || 0), 0);
 
   return (
+    <>
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
 
@@ -351,5 +353,16 @@ export default function CoursePage() {
 
       <Footer />
     </div>
+
+    {showCheckout && (
+      <CheckoutModal
+        amount={fakePrice}
+        originalAmount={fakeOriginal}
+        itemCount={1}
+        onClose={() => setShowCheckout(false)}
+        onSuccess={handleBuyPaymentSuccess}
+      />
+    )}
+    </>
   );
 }
