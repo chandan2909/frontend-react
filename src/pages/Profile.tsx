@@ -102,10 +102,20 @@ export default function ProfilePage() {
                       to={`/subjects/${p.subject_id}`}
                       className="group flex flex-col h-full bg-white border border-gray-200 hover:border-black transition-colors cursor-pointer text-left"
                     >
-                      {/* Thumbnail Placeholder */}
-                      <div className="w-full aspect-video bg-[#2d2f31] flex items-center justify-center relative overflow-hidden">
-                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity z-10"></div>
-                         <svg className="w-12 h-12 text-white opacity-50 z-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                      {/* Thumbnail */}
+                      <div className="w-full aspect-video bg-[#2d2f31] relative overflow-hidden">
+                        {p.thumbnail_url ? (
+                          <img
+                            src={p.thumbnail_url}
+                            alt={p.subject_title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        ) : null}
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity z-10"></div>
+                        {!p.thumbnail_url && (
+                          <svg className="w-12 h-12 text-white opacity-50 absolute inset-0 m-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        )}
                       </div>
 
                       <div className="p-4 flex flex-col flex-grow">

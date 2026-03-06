@@ -62,10 +62,19 @@ export default function CartPage() {
                   {items.map((item) => (
                     <div key={item.id} className="flex items-start gap-4 p-5">
                       {/* Thumbnail */}
-                      <div className={`w-32 h-20 rounded bg-gradient-to-br ${item.gradient} flex items-center justify-center flex-shrink-0`}>
-                        <svg className="w-8 h-8 text-white opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        </svg>
+                      <div className={`w-32 h-20 rounded overflow-hidden flex-shrink-0 relative bg-gradient-to-br ${item.gradient}`}>
+                        {item.thumbnail_url ? (
+                          <img
+                            src={item.thumbnail_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        ) : (
+                          <svg className="w-8 h-8 text-white opacity-50 absolute inset-0 m-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          </svg>
+                        )}
                       </div>
 
                       {/* Info */}

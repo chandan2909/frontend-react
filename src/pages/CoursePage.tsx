@@ -116,6 +116,7 @@ export default function CoursePage() {
       price: fakePrice,
       originalPrice: fakeOriginal,
       gradient: getGradient(parsedId),
+      thumbnail_url: subject?.thumbnail_url,
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);

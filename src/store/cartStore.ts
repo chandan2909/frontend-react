@@ -8,6 +8,7 @@ export interface CartItem {
   price: number;
   originalPrice: number;
   gradient: string;
+  thumbnail_url?: string;
 }
 
 interface CartState {
