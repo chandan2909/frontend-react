@@ -60,11 +60,6 @@ export default function ChatbotPage() {
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
-  // Streaming state
-  const [streamingText, setStreamingText] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const streamingChatIdRef = useRef<string | null>(null);
-  const streamIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -135,10 +130,10 @@ export default function ChatbotPage() {
     }
   }, [chats, isAuthenticated]);
 
-  // Scroll to bottom when messages change OR while streaming
+  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeChat?.messages, loading, streamingText]);
+  }, [activeChat?.messages, loading]);
 
   // Handle window resize for sidebar
   useEffect(() => {
@@ -207,7 +202,7 @@ export default function ChatbotPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || loading || isStreaming) return;
+    if (!input.trim() || loading) return;
 
     const userMsg = input.trim();
     setInput('');
@@ -239,77 +234,109 @@ export default function ChatbotPage() {
       } catch { /* ignore, will still work locally */ }
     }
 
-    let aiText = "Sorry, I couldn't process your request.";
-    try {
-      const messagesPayload = [
-        { role: 'system', content: 'You are Kodemy AI Assistant, a helpful learning assistant. Provide clear and concise answers.' },
-        ...activeChat.messages.map(m => ({ role: m.role, content: m.content })),
-        { role: 'user', content: userMsg }
-      ];
+    let aiText = "";
+    
+    // Setup initial empty bot message
+    updateLocalChat(chatId, chat => ({
+        ...chat,
+        messages: [...chat.messages, { role: 'assistant', content: '' }],
+    }));
 
-      const response = await fetch('https://spoidermon29-lms-ai-assistant.hf.space/v1/chat/completions', {
+    try {
+      const messagesPayload = activeChat.messages.map(m => ({ role: m.role, content: m.content }));
+
+      await apiClient.post('/chats/stream', {
+        message: userMsg,
+        history: messagesPayload
+      }, {
+        responseType: 'stream',
+      });
+
+    } catch {
+      // Ignored for the new fetch block
+    }
+
+    try {
+      const messagesPayload = activeChat.messages.map(m => ({ role: m.role, content: m.content }));
+      
+      const token = localStorage.getItem('token'); // Fallback token getter, change based on actual auth implementation
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`; // Just in case it's needed
+      }
+
+      const fetchUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/chats/stream` : '/api/chats/stream';
+
+      const streamResponse = await fetch(fetchUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
-          messages: messagesPayload,
-          temperature: 0.7,
-          max_tokens: 1024,
+          message: userMsg,
+          history: messagesPayload
         })
       });
 
-      if (!response.ok) {
+      if (!streamResponse.ok) {
         throw new Error('Failed to fetch from AI server');
       }
 
-      const data = await response.json();
-      if (data.choices && data.choices.length > 0 && data.choices[0].message) {
-        aiText = data.choices[0].message.content;
-      }
-    } catch {
-      aiText = "Sorry, I'm having trouble connecting to the AI server right now. Please try again.";
-    }
+      setLoading(false); // Stop loader as soon as connection is established
 
-    // Stop the three-dot loader and start streaming
-    setLoading(false);
-    setIsStreaming(true);
-    streamingChatIdRef.current = chatId;
+      const reader = streamResponse.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
 
-    // Clear any previous streaming interval
-    if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-    let charIndex = 0;
-    // Slower adaptive speed: reveal the full text in roughly 3–8 seconds
-    // Short responses ~3s, long responses up to 8s
-    const totalChars = aiText.length;
-    const targetMs = Math.min(8000, Math.max(3000, totalChars * 15));
-    const tickMs = 30; // ~33fps — smooth but visibly slower
-    const charsPerTick = Math.max(1, Math.ceil(totalChars / (targetMs / tickMs)));
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
 
-    streamIntervalRef.current = setInterval(() => {
-      charIndex = Math.min(charIndex + charsPerTick, totalChars);
-      setStreamingText(aiText.slice(0, charIndex));
+          for (const line of lines) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+              try {
+                const data = JSON.parse(line.slice(6));
+                const token = data.choices[0]?.delta?.content || "";
+                aiText += token;
 
-      if (charIndex >= totalChars) {
-        // Streaming done — commit to permanent messages
-        if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
-        updateLocalChat(chatId, chat => ({
-          ...chat,
-          messages: [...chat.messages, { role: 'assistant', content: aiText }],
-        }));
-        setIsStreaming(false);
-        setStreamingText('');
-        streamingChatIdRef.current = null;
-
-        // Persist to backend fire-and-forget
-        if (isAuthenticated) {
-          apiClient.post(`/chats/${chatId}/messages`, {
-            role: 'assistant',
-            content: aiText,
-            createdAt: Date.now(),
-          }).catch(() => { /* ignore */ });
+                // Instantly update the UI with the new token
+                updateLocalChat(chatId, chat => {
+                  const newChat = { ...chat };
+                  const msgs = [...newChat.messages];
+                  msgs[msgs.length - 1] = { role: 'assistant', content: aiText };
+                  newChat.messages = msgs;
+                  return newChat;
+                });
+              } catch (e) {
+                // Ignore partial JSON chunks
+              }
+            }
+          }
         }
       }
-    }, tickMs);
+    } catch (e) {
+      aiText = "Sorry, I'm having trouble connecting to the AI server right now. Please try again.";
+      updateLocalChat(chatId, chat => {
+        const newChat = { ...chat };
+        const msgs = [...newChat.messages];
+        msgs[msgs.length - 1] = { role: 'assistant', content: aiText };
+        newChat.messages = msgs;
+        return newChat;
+      });
+    }
+
+    // Persist to backend fire-and-forget
+    if (isAuthenticated && aiText) {
+      apiClient.post(`/chats/${chatId}/messages`, {
+        role: 'assistant',
+        content: aiText,
+        createdAt: Date.now(),
+      }).catch(() => { /* ignore */ });
+    }
+
+
+    // Stop the three-dot loader and start streaming
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -414,10 +441,6 @@ export default function ChatbotPage() {
             {activeChat?.messages.map((msg, i) => (
               <ChatMessage key={i} role={msg.role} content={msg.content} />
             ))}
-            {/* Streaming message — shown while typewriter reveal is running */}
-            {isStreaming && streamingChatIdRef.current === activeChat?.id && (
-              <ChatMessage role="assistant" content={streamingText + '▋'} />
-            )}
             {loading && (
               <div className="py-6 px-4 bg-[#f7f9fa] border-y border-gray-100">
                 <div className="max-w-3xl mx-auto flex gap-6">
