@@ -242,27 +242,15 @@ export default function ChatbotPage() {
         messages: [...chat.messages, { role: 'assistant', content: '' }],
     }));
 
-    try {
-      const messagesPayload = activeChat.messages.map(m => ({ role: m.role, content: m.content }));
 
-      await apiClient.post('/chats/stream', {
-        message: userMsg,
-        history: messagesPayload
-      }, {
-        responseType: 'stream',
-      });
-
-    } catch {
-      // Ignored for the new fetch block
-    }
 
     try {
       const messagesPayload = activeChat.messages.map(m => ({ role: m.role, content: m.content }));
       
-      const token = localStorage.getItem('token'); // Fallback token getter, change based on actual auth implementation
+      const token = useAuthStore.getState().accessToken;
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`; // Just in case it's needed
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
       const fetchUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/chats/stream` : '/api/chats/stream';
