@@ -90,13 +90,6 @@ export default function Header() {
                  </button>
                </div>
                <div className="p-4 flex flex-col gap-4">
-                 <Link 
-                   to="/chat" 
-                   onClick={() => setMobileMenuOpen(false)}
-                   className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold bg-[#1c1d1f] text-white rounded hover:bg-black transition-colors"
-                 >
-                   <span className="text-base leading-none relative top-[-1px]">✨</span> AI Assistant
-                 </Link>
                  <HeaderActions isMobile={true} closeMenu={() => setMobileMenuOpen(false)} />
                </div>
             </motion.div>
