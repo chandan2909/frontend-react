@@ -22,9 +22,9 @@ export default function Header() {
         <Menu className="w-6 h-6" />
       </button>
 
-      <Link to="/" className="flex items-center gap-2 flex-shrink-0 text-[24px] md:text-[28px] font-black tracking-tighter text-[#1c1d1f] font-serif decoration-none">
-        <img src="/favicon.png" alt="Kodemy Logo" className="w-8 h-8 md:w-10 md:h-10 rounded-lg shadow-sm" />
-        Kodemy
+      <Link to="/" className="flex items-center gap-[0.5px] flex-shrink-0 text-[24px] md:text-[28px] font-black tracking-tighter text-[#1c1d1f] font-serif decoration-none group">
+        <img src="/favicon.png" alt="K" className="w-[30px] h-[30px] md:w-[34px] md:h-[34px] rounded-lg shadow-sm transition-transform group-hover:scale-105" />
+        <span className="-ml-[2px]">odemy</span>
       </Link>
 
       <div className="flex items-center gap-2 md:gap-4 flex-shrink-0 ml-auto">
@@ -85,9 +85,9 @@ export default function Header() {
               className="fixed top-0 left-0 bottom-0 w-64 bg-white z-[70] shadow-xl overflow-y-auto"
             >
                <div className="p-4 border-b border-gray-200 flex justify-between items-center h-[72px]">
-                 <div className="flex items-center gap-2">
-                   <img src="/favicon.png" alt="Kodemy Logo" className="w-8 h-8 rounded-lg shadow-sm" />
-                   <span className="font-serif font-black text-[24px] tracking-tighter text-[#1c1d1f]">Kodemy</span>
+                 <div className="flex items-center gap-[0.5px]">
+                   <img src="/favicon.png" alt="K" className="w-[30px] h-[30px] rounded-lg shadow-sm" />
+                   <span className="-ml-[2px] font-serif font-black text-[24px] tracking-tighter text-[#1c1d1f]">odemy</span>
                  </div>
                  <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu" className="p-2 -mr-2 text-[#1c1d1f]">
                    <X className="w-6 h-6" />
