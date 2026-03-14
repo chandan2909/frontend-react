@@ -40,13 +40,21 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white relative">
       <Header />
-      <div className="flex flex-col items-center justify-center flex-grow px-4">
+      
+      {loading && (
+        <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+          <p className="mt-4 font-bold text-gray-700 font-serif">Creating account...</p>
+        </div>
+      )}
+
+      <div className="flex flex-col items-center justify-center flex-grow px-4 my-8">
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center">
             <h1 className="text-3xl font-semibold tracking-tight text-[#1c1d1f]">Create an account</h1>
-            <p className="mt-2 text-sm text-gray-500">Start learning today</p>
+            <p className="mt-2 text-sm text-gray-500">Sign up to get started</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 mt-8">
@@ -89,7 +97,6 @@ export default function RegisterPage() {
                 required
                 minLength={6}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black text-black"
-                placeholder="Minimum 6 characters"
               />
             </div>
 
@@ -102,16 +109,20 @@ export default function RegisterPage() {
                 required
                 minLength={6}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black text-black"
-                placeholder="Re-enter your password"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-6 bg-black text-white whitespace-nowrap py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 font-bold"
+              className="w-full mt-6 bg-black text-white whitespace-nowrap py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 font-bold flex items-center justify-center gap-2"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+                  Sign up...
+                </>
+              ) : 'Sign up'}
             </button>
           </form>
 

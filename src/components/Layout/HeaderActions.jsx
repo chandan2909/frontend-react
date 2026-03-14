@@ -5,6 +5,7 @@ import useAuthStore from '../../store/authStore';
 export default function HeaderActions({ isMobile, closeMenu }) {
   const { isAuthenticated, logout, user } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -15,15 +16,26 @@ export default function HeaderActions({ isMobile, closeMenu }) {
 
   if (!mounted) return null;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    // Simulate a brief delay to show the spinner intentionally
+    await new Promise(resolve => setTimeout(resolve, 600));
     logout();
     if (closeMenu) closeMenu();
+    setIsLoggingOut(false);
     navigate('/');
   };
 
   if (isAuthenticated) {
     return (
-      <nav className={`flex ${isMobile ? 'flex-col items-start gap-4' : 'items-center gap-3'}`}>
+      <>
+        {isLoggingOut && (
+          <div className="fixed inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center z-[100]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+            <p className="mt-4 font-bold text-gray-700 font-serif">Logging out...</p>
+          </div>
+        )}
+        <nav className={`flex ${isMobile ? 'flex-col items-start gap-4' : 'items-center gap-3'}`}>
         {isMobile && user && (
           <div 
              className="flex items-center gap-3 w-full pb-4 border-b border-gray-100 mb-2 p-2 rounded-lg"
@@ -54,6 +66,7 @@ export default function HeaderActions({ isMobile, closeMenu }) {
           </div>
         )}
       </nav>
+      </>
     );
   }
 

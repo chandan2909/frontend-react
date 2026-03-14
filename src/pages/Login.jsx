@@ -30,8 +30,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white relative">
       <Header />
+      
+      {loading && (
+        <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+          <p className="mt-4 font-bold text-gray-700 font-serif">Signing in...</p>
+        </div>
+      )}
+
       <div className="flex flex-col items-center justify-center flex-grow px-4">
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center">
@@ -72,9 +80,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-6 bg-black text-white whitespace-nowrap py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 font-bold"
+              className="w-full mt-6 bg-black text-white whitespace-nowrap py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 font-bold flex items-center justify-center gap-2"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+                  Signing in...
+                </>
+              ) : 'Sign in'}
             </button>
           </form>
 
